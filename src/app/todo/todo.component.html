@@ -6,31 +6,59 @@
       </h3>
 
       <div class="input-group mb-3">
-        <input type="text" class="form-control">
-        <button class="btn btn-primary">Add</button>
+        <!-- (blur)="AddItem(inputText)" -->
+        <input [(ngModel)]="inputText" type="text" class="form-control" (keyup.enter)="AddItem();;">
+        <button [class.disabled]="inputText.length==0" class="btn btn-primary" (click)="AddItem();">Add</button>
       </div>
 
       <div class="form-check mb-3">
-        <input type="checkbox" class="form-check-input" name="" id="DisplayAll">
+        <input type="checkbox" [(ngModel)]="displayAll" class="form-check-input" name="" id="DisplayAll">
         <label for="DisplayAll" class="form-check-label">Hepsini Göster</label>
       </div>
 
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Description</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of GetItems(); let i = index;">
-            <td> {{i + 1}} </td>
-            <td> {{item.description}} </td>
-            <td> {{item.action}} </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="my-2">
+        <span>Completed Count</span>
+        <div class="badge bg-success ms-2">
+          {{DisplayCompletedCount()}}
+        </div>
+      </div>
+
+      <ng-template #itemsTable>
+        <table class="table table-bordered" *ngIf="GetItems().length>0">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Description</th>
+              <th>Action</th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of GetItems(); let i = index;" [class]="{'bg-success':item.action, 'bg-warning':!item.action}">
+              <td> {{i + 1}} </td>
+              <td> {{item.description}} </td>
+              <td>
+                <span [ngSwitch]="item.action">
+                  <span *ngSwitchCase="true">
+                    YES
+                  </span>
+                  <span *ngSwitchCase="false">
+                    NO
+                  </span>
+                </span>
+              </td>
+              <td><input type="checkbox" (change)="OnActionChanged(item)" [(ngModel)]="item.action"></td>
+              <td><button class="btn btn-danger btn-sm" (click)="DeleteItem(item.description)">x</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </ng-template>
+
+      <div class="alert alert-danger" *ngIf="GetItems().length==0; else itemsTable">
+        Tüm Görevler Tamamlandı
+      </div>
+
     </div>
   </div>
 </div>
